@@ -46,14 +46,14 @@ class Session:
         else:
             return self.get(self.url+'/browser/api/datasources/project/%s%s'%(project, self.creds))
 
-    def get_datasource_data(self, project, data_source):
+    def get_datasource(self, project, data_source):
         '''
         /data/<isid>/<projectid>/<dskeys>/<ids>
         A wildcard “*” may be specified to retrieve data for 
         all of the IDs from the project’s summary datasource.
         '''
-
-        return self.get(self.url+'/browser/api/data/*/')
+        d = self.get(self.url+'/browser/api/data/%s/%i/%i/*%s'%(self.user, project, data_source, self.creds)).text
+        return json.loads(d)
 
     def get_structures(self, project):
         '''/structure/<isid>/<projectid>/<ids>'''

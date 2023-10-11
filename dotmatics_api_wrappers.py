@@ -37,7 +37,7 @@ class Session:
 
     def get_datasources(self, project = 'all'):
         '''
-        Get all datasources or all datasources from a project
+        Get list of all datasources or all datasources from a project
         /datasources/project/<projectid>
         '''
         if project == 'all':
@@ -45,14 +45,17 @@ class Session:
             return self.get(self.url+'/browser/api/datasources%s'%(self.creds))
         else:
             return self.get(self.url+'/browser/api/datasources/project/%s%s'%(project, self.creds))
-
-    def get_datasource(self, project, data_source):
+    def get_datasource_info(self, datasource):
+        d = self.get(self.url+'/browser/api/datasources/%s%s'%(datasource, self.creds)).text
+        return json.loads(d)
+    def get_datasource(self, project, data_source, ids = '*',params=''):
         '''
         /data/<isid>/<projectid>/<dskeys>/<ids>
-        A wildcard “*” may be specified to retrieve data for 
-        all of the IDs from the project’s summary datasource.
+        A wildcard “*” may be specified to retrieve data for
+        all of the IDs from the project’s summary datasource
+        params can be offset=<number> or limit=<number>
         '''
-        d = self.get(self.url+'/browser/api/data/%s/%i/%i/*%s'%(self.user, project, data_source, self.creds)).text
+        d = self.get(self.url+'/browser/api/data/%s/%i/%i/%s%s&%s'%(self.user, project, data_source, ids, self.creds, params)).text
         return json.loads(d)
 
     def get_structures(self, project):

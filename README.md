@@ -1,5 +1,7 @@
 # dotmatics
-Dotmatics ETL
+<h1>Dotmatics ETL</h1>
+See SA Usage and Documentation on Confluence: https://confluence.schrodinger.com/display/SA/Dotmatics+Integration+via+DataIntegrator
+<hr>
 
 Using the barebones api wrappers:
 

@@ -3,3 +3,4 @@ config.py
 *.mol
 *.sdf
 __pychache__/*
+*swp

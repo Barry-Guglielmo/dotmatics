@@ -34,7 +34,8 @@ class Session:
     def get_users(self):
         '''/browser/api/users'''
         return self.get(self.url+'/browser/api/users')
-
+    def get_protocol(self, protocol):
+        return json.loads(self.get(self.url+'/browser/api/studies/protocol/%s%s'%(str(protocol),self.creds)).text)
     def get_datasources(self, project = 'all'):
         '''
         Get list of all datasources or all datasources from a project

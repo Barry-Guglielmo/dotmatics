@@ -10,7 +10,7 @@ def SimpleSchema_Session(SIMPLE_SCHEMA_DB_CONFIG):
                         port=SIMPLE_SCHEMA_DB_CONFIG["port"],
                         host=SIMPLE_SCHEMA_DB_CONFIG["host"])
 
-class Basic_Project_Info():
+class Project_Info():
     def __init__(self, session, filter = True, config_projects=['LIVEDESIGN_REG_INT','LIVEDESIGN_STUDIES_INT']):
         '''
         This will make it easier to look through different projects information
@@ -42,9 +42,12 @@ class Basic_Project_Info():
                 names[pi['projectName']] = i
                 datasources[pi['projectName']] = pi['dataSources']
                 datasource_names[pi['projectName']] = [[k['name'],k['dsID']] for j,k in datasources[pi['projectName']].items()]
-
-        self.project_info = info
-        self.project_names = names
+        self.pks = self.session.get_projects()
+        self.pk_and_name = {}
+        for i in self.pks:
+            self.pk_and_name[i] = self.session.get_project(i)['projectName']
+        self.datasource_info = info
+        self.datasource_names = names
         self.datasources = datasources
         self.datasource_names = datasource_names
 
@@ -81,16 +84,12 @@ class Study_Data():
         self.session = session
         self.offset = offset
         self.config = dotmatics_sources['studies']
-        #self.summary = session.get_datasource(self.config['projectID'], self.config['summary_datasource']['dsID'])
-        #self.audit = session.get_datasource(self.config['projectID'], self.config['audit_datasource']['dsID'])
         self.study = session.get_datasource(self.config['projectID'], self.config['study_datasource']['dsID'])
         self.protocols = {}
 
     def cycle(self):
         self.offset += 1000
-        #self.summary = session.get_datasource(self.config['projectID'], self.config['summary_datasource']['dsID'],params='&offset=%i'%self.offset)
-        #self.audit = session.get_datasource(self.config['projectID'], self.config['audit_datasource']['dsID'],params='&offset=%i'%self.offset)
-        self.study = session.get_datasource(self.config['projectID'], self.config['study_datasource']['dsID'],params='&offset=%i'%self.offset)
+        self.study = self.session.get_datasource(self.config['projectID'], self.config['study_datasource']['dsID'],params='&offset=%i'%self.offset)
 
     def clean_data(self):
         # study, dictionary
@@ -101,7 +100,6 @@ class Study_Data():
                 # flatten the data structure and make it easy to use
                 # results is a dictionary of someID and a dictionary
                 # still not sure how to relate the outcome with the sample
-#                lst.append({'studyID':k, 'dataSource':i, 'results':j})
                 for o,p in j.items():
                     r = p
                     r['studyID'] =k
@@ -119,7 +117,3 @@ class Study_Data():
                             r['PROTOCOL_NAME'] = 'N/A'
                     lst.append(r)
         self.data = lst
-        # self.study['141892']['dataSources']['939']['4953']['ANALYSIS_NAME']
-
-# s = Session(DOTMATICS_API_CONFIG['url'],DOTMATICS_API_CONFIG['user'],DOTMATICS_API_CONFIG['password'])
-# d = Compound_Data(s, DOTMATICS_SOURCES)

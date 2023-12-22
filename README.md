@@ -50,3 +50,10 @@ DOTMATICS_SOURCES = {
               }
 }
 ```
+
+Until Auditing is Set Up Use Cronjob to Run Full Reloads:
+```bash
+# Run Scinamic Script Every 15 minutes
+0 11 * * * sudo /vol/bluebird/seurat/pro_serv/dotmatics_integration/chef/dotmatics_runner.sh
+0 23 * * * sudo /vol/bluebird/seurat/pro_serv/dotmatics_integration/chef/dotmatics_runner.sh
+```

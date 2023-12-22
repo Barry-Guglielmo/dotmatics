@@ -22,15 +22,11 @@ def compound_map(dotmatics_compounds):
             try:
                 if 'DATE_CREATED' in dot_cmpd:
                     date = dot_cmpd['DATE_CREATED']
-                    print(date)
                 elif 'REG_DATE' in dot_cmpd:
                     date = dot_cmpd['REG_DATE']
                     date = re.match(r'(\d{2}/\d{2}/\d{4}) (\d{2}:\d{2}:\d{2})', date)
                     day, month, year = date.group(1).split('/') 
                     date = f"{year}-{month}-{day}"
-                    print('lets see:')
-                    print(date)
-
                 Compound.register(
                             corporate_id = dot_cmpd['compoundID'],
                             # customer_key=dot_cmpd['pk'],
@@ -65,6 +61,18 @@ def compound_map(dotmatics_compounds):
                     CompoundProject.register(compound_id = ld_cmpd.id, project_id = ld_proj_pk)
 
 def assay_map(results):
+    '''
+    Map Assay data (results from Studies) back to compounds. There is no project Level info here. I am looking for a workaround.
+
+    This function takes in a list of dictionary objects. This list is created using the Study_Data() class found in api.py
+    Once you have recieved the data from dotmatics we use a function built into  Study_Data called clean_data() which provides
+    a nice flat list of dicts to use in this process. The raw retrun from dotmatics is a little hard to use and this makes it easier to read and debug.
+
+    Attributes
+    ----------
+    results : list
+        A list of dictionaries to itterate through and load into simple schema.
+    '''
     for result in results:
         try:
             compound = Compound.get(corporate_id=re.sub(REGEX_COMPOUND_ASSAY, '', result['ID']))
@@ -106,10 +114,15 @@ def assay_map(results):
                                                             unit = conc,
                                                             value_operator = value_operator
                                                             )
+            # key for the project?? Add it here and also register to ALL or Global (put that in the config)
             CompoundObservationProject.register(compound_observation=co,
                                         project=Project.get(key='ALL'))
+
+#            CompoundObservationProject.register(compound_observation=co,
+#                                        project=Project.get(key=result['studyID']))
         elif compound != False:
-            print(result)
+            # need to set this logging a little differently, it will be if there is no compound or result (mostly invalidated results or High/Low standards)
+            x = 0 # place holder action until logging set up
             '''
                 co = CompoundObservation.register(compound = compound,
                                                             assay = assay,

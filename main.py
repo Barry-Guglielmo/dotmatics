@@ -25,7 +25,16 @@ while 'status' not in compounds.compounds:
         compounds.clean_data()
     except:
         print(compounds.compounds)
-
+# Do the same as above but for Results/Studies/Protocols/Assays** Whatever you wanna call them
 results = Study_Data(dotmatics_session, DOTMATICS_SOURCES)
 results.clean_data()
-assay_map(results.data)
+while 'status' not in results.study:
+    # map the compounds into SS
+    assay_map(results.data)
+    results.cycle()
+    try:
+        results.clean_data()
+    except:
+        print(results.study)
+
+print('Complete')

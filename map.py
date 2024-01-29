@@ -4,7 +4,6 @@ from simpleschema.schemas import SimpleSchema
 from rdkit import Chem
 import re
 
-
 def compound_map(dotmatics_compounds):
     ''' Take in a list of dictionaries of compounds and add them to SimpleSchema'''
 
@@ -50,11 +49,6 @@ def compound_map(dotmatics_compounds):
                 x = 0
             if DOTMATICS_PROJECTS_CONFIG['GLOBAL']:
                 for i in DOTMATICS_PROJECTS_CONFIG['GLOBAL']:
-                    co = CompoundObservation.register(compound = ld_cmpd,
-                                                            assay = Assay.get(key='dotmatics_upgrade_source'),
-                                                            endpoint = 'From Upgrade',
-                                                            text_value = 'Upgrade In Progress',
-                                                            )
                     ld_proj_pk = Project.get(key = i).id
                     CompoundObservationProject.register(compound_observation=co,
                                         project_id=ld_proj_pk)
@@ -73,6 +67,9 @@ def assay_map(results):
     results : list
         A list of dictionaries to itterate through and load into simple schema.
     '''
+    s = Session(DOTMATICS_API_CONFIG['url'],DOTMATICS_API_CONFIG['user'],DOTMATICS_API_CONFIG['password'])
+    projects = list(Project_Info(s).pk_and_name.values())
+
     for result in results:
         try:
             compound = Compound.get(corporate_id=re.sub(REGEX_COMPOUND_ASSAY, '', result['ID']))
@@ -107,9 +104,9 @@ def assay_map(results):
          #   unit = ''
 
         if 'RESULT_NUMERIC' in result and compound != False:
-            co = CompoundObservation.register(compound = compound, 
-                                                            assay = assay, 
-                                                            endpoint = result['ANALYSIS_NAME'], 
+            co = CompoundObservation.register(compound = compound,
+                                                            assay = assay,
+                                                            endpoint = result['ANALYSIS_NAME'],
                                                             num_value = result['RESULT_NUMERIC'],
                                                             unit = conc,
                                                             value_operator = value_operator
@@ -117,33 +114,18 @@ def assay_map(results):
             # key for the project?? Add it here and also register to ALL or Global (put that in the config)
             CompoundObservationProject.register(compound_observation=co,
                                         project=Project.get(key='ALL'))
-
+#            for i in projects:
+ #               try:
+  #                  CompoundObservationProject.register(compound_observation=co,
+   #                                     project=Project.get(key=i))
+    #            except:
+     #               x = 0 # place holder. Probably dont want to just make a project on the fly seeing as there are lots of tests
+#                    Project.register(customer_key = i, key = i)
+#                    CompoundObservationProject.register(compound_observation=co,
+#                                        project=Project.get(key=i))
 #            CompoundObservationProject.register(compound_observation=co,
 #                                        project=Project.get(key=result['studyID']))
         elif compound != False:
             # need to set this logging a little differently, it will be if there is no compound or result (mostly invalidated results or High/Low standards)
             x = 0 # place holder action until logging set up
-            '''
-                co = CompoundObservation.register(compound = compound,
-                                                            assay = assay,
-                                                            endpoint = result['ANALYSIS_NAME'],
-                                                            text_value = result['value_text'],
-                                                            unit = unit,
-                                                            value_operator = value_operator
-                                                            )
-               '''
-        '''  # handle the project ACLs
-                    if ',' in i['project']:
-                        ps = i['project'].split(',')
-                        for p in ps + SCINAMIC_PROJECTS_CONFIG['GLOBAL']:
-                            CompoundObservationProject.register(compound_observation=co,
-                                        project=Project.get(key=p))
-                    else:
-                        CompoundObservationProject.register(compound_observation=co,
-                                        project=Project.get(key=i['project']))
-                        for i in SCINAMIC_PROJECTS_CONFIG['GLOBAL']:
-                            CompoundObservationProject.register(compound_observation=co,
-                                        project=Project.get(key=i))
-'''
-        # now, there may be batch data that needs tweeking!!
 

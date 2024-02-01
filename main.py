@@ -12,7 +12,6 @@ dotmatics_session = Session(DOTMATICS_API_CONFIG['url'],DOTMATICS_API_CONFIG['us
 simpleschema_session = SimpleSchema_Session(SIMPLE_SCHEMA_DB_CONFIG)
 simpleschema_session.clear_all()
 add_projects_to_ss()
-Assay.register(key='dotmatics_upgrade_source')
 # this will move to etl.py, but for quick testing we can put it here
 compounds = Compound_Data(dotmatics_session, DOTMATICS_SOURCES)
 # This cleaning step makes the information returned from Dotmatics much easier to work with (takes less than a second to run). Suggested for SA usage and required for this code base.
